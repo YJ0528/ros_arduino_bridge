@@ -64,13 +64,19 @@
 
    /* L298 Motor driver*/
    #define L298_MOTOR_DRIVER
+
+   /* Encoders directly attached to ESP32 board */
+  //  #define ESP32_ENC_COUNTER
+
+   
+   
 #endif
 
 //#define USE_SERVOS  // Enable use of PWM servos as defined in servos.h
 #undef USE_SERVOS     // Disable use of PWM servos
 
 /* Serial port baud rate */
-#define BAUDRATE     57600
+#define BAUDRATE     115200
 
 /* Maximum PWM signal */
 #define MAX_PWM        255
@@ -101,7 +107,7 @@
   #include "encoder_driver.h"
 
   /* PID parameters and functions */
-  #include "diff_controller.h"
+ #include "diff_controller.h"
 
   /* Run the PID loop at 30 times per second */
   #define PID_RATE           30     // Hz
@@ -122,7 +128,7 @@
 
 // A pair of varibles to help parse serial commands (thanks Fergs)
 int arg = 0;
-int index = 0;
+int cmd_index = 0;
 
 // Variable to hold an input character
 char chr;
@@ -146,11 +152,11 @@ void resetCommand() {
   arg1 = 0;
   arg2 = 0;
   arg = 0;
-  index = 0;
+  cmd_index = 0;
 }
 
 /* Run a command.  Commands are defined in commands.h */
-int runCommand() {
+void runCommand() {
   int i = 0;
   char *p = argv1;
   char *str;
@@ -211,12 +217,12 @@ int runCommand() {
     lastMotorCommand = millis();
     if (arg1 == 0 && arg2 == 0) {
       setMotorSpeeds(0, 0);
-      resetPID();
-      moving = 0;
+     resetPID();
+     moving = 0;
     }
-    else moving = 1;
-    leftPID.TargetTicksPerFrame = arg1;
-    rightPID.TargetTicksPerFrame = arg2;
+   else moving = 1;
+   leftPID.TargetTicksPerFrame = arg1;
+   rightPID.TargetTicksPerFrame = arg2;
     Serial.println("OK"); 
     break;
   case MOTOR_RAW_PWM:
@@ -225,19 +231,19 @@ int runCommand() {
     resetPID();
     moving = 0; // Sneaky way to temporarily disable the PID
     setMotorSpeeds(arg1, arg2);
-    Serial.println("OK"); 
-    break;
-  case UPDATE_PID:
-    while ((str = strtok_r(p, ":", &p)) != '\0') {
-       pid_args[i] = atoi(str);
-       i++;
-    }
-    Kp = pid_args[0];
-    Kd = pid_args[1];
-    Ki = pid_args[2];
-    Ko = pid_args[3];
     Serial.println("OK");
     break;
+ case UPDATE_PID:
+    while ((str = strtok_r(p, ":", &p)) != NULL) {
+      pid_args[i] = atoi(str);
+      i++;
+   }
+   Kp = pid_args[0];
+   Kd = pid_args[1];
+   Ki = pid_args[2];
+   Ko = pid_args[3];
+   Serial.println("OK");
+   break;
 #endif
   default:
     Serial.println("Invalid Command");
@@ -271,6 +277,8 @@ void setup() {
     
     // enable PCINT1 and PCINT2 interrupt in the general interrupt mask
     PCICR |= (1 << PCIE1) | (1 << PCIE2);
+  #elif defined ESP32_ENC_COUNTER
+    setupEncoders();
   #endif
   initMotorController();
   resetPID();
@@ -300,8 +308,8 @@ void loop() {
 
     // Terminate a command with a CR
     if (chr == 13) {
-      if (arg == 1) argv1[index] = NULL;
-      else if (arg == 2) argv2[index] = NULL;
+      if (arg == 1) argv1[cmd_index] = NULL;
+      else if (arg == 2) argv2[cmd_index] = NULL;
       runCommand();
       resetCommand();
     }
@@ -310,9 +318,9 @@ void loop() {
       // Step through the arguments
       if (arg == 0) arg = 1;
       else if (arg == 1)  {
-        argv1[index] = NULL;
+        argv1[cmd_index] = NULL;
         arg = 2;
-        index = 0;
+        cmd_index = 0;
       }
       continue;
     }
@@ -323,12 +331,12 @@ void loop() {
       }
       else if (arg == 1) {
         // Subsequent arguments can be more than one character
-        argv1[index] = chr;
-        index++;
+        argv1[cmd_index] = chr;
+        cmd_index++;
       }
       else if (arg == 2) {
-        argv2[index] = chr;
-        index++;
+        argv2[cmd_index] = chr;
+        cmd_index++;
       }
     }
   }
