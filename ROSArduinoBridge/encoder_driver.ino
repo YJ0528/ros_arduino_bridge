@@ -68,6 +68,54 @@
       return;
     }
   }
+#elif defined ESP32_ENC_COUNTER
+
+  #include <ESP32Encoder.h>
+  
+  extern bool loopTaskWDTEnabled;
+  extern TaskHandle_t loopTaskHandle;
+
+  // Callback function for encoder interrupts
+  static IRAM_ATTR void enc_cb(void* arg) {
+    ESP32Encoder* enc = (ESP32Encoder*) arg;
+    // add any immediate processing here if needed
+    // For example, toggle an LED to visualize encoder activity:
+    // static bool led_state = false;
+    // digitalWrite(LED_BUILTIN, led_state);
+    // led_state = !led_state;
+  }
+
+  ESP32Encoder leftEncoder(true, enc_cb);
+  ESP32Encoder rightEncoder(true, enc_cb);
+  
+  void setupEncoders() {
+
+    // Enable the weak pull up resistors
+    ESP32Encoder::useInternalWeakPullResistors = puType::up;
+    
+    // Configure encoder pins
+    leftEncoder.attachSingleEdge(LEFT_ENC_A, LEFT_ENC_B);
+    rightEncoder.attachSingleEdge(RIGHT_ENC_A, RIGHT_ENC_B);
+    
+    // Clear encoder counts
+    leftEncoder.clearCount();
+    rightEncoder.clearCount();
+
+    // Clear encoder counts
+    leftEncoder.setFilter(127);
+    rightEncoder.setFilter(127);
+        
+  }
+
+  long readEncoder(int i) {
+    if (i == LEFT) return leftEncoder.getCount();
+    else return rightEncoder.getCount();
+  }
+
+  void resetEncoder(int i) {
+    if (i == LEFT) leftEncoder.clearCount();
+    else rightEncoder.clearCount();
+  }
 #else
   #error A encoder driver must be selected!
 #endif
@@ -79,4 +127,3 @@ void resetEncoders() {
 }
 
 #endif
-
