@@ -11,6 +11,20 @@
   #define LEFT_MOTOR_ENABLE 13
 #endif
 
+#ifdef CYTRON_MDD3A
+
+  /* Include the Pololu library */
+  #include "CytronMotorDriver.h"
+  
+  #define M1A 32
+  #define M1B 33
+  #define M2A 18
+  #define M2B 19
+
+  extern CytronMD motor1;
+  extern CytronMD motor2;
+#endif
+
 void initMotorController();
 void setMotorSpeed(int i, int spd);
 void setMotorSpeeds(int leftSpeed, int rightSpeed);
