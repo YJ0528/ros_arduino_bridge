@@ -60,15 +60,16 @@
    //#define ROBOGAIA
    
    /* Encoders directly attached to Arduino board */
-   #define ARDUINO_ENC_COUNTER
+   //#define ARDUINO_ENC_COUNTER
 
    /* L298 Motor driver*/
-   #define L298_MOTOR_DRIVER
+   //#define L298_MOTOR_DRIVER
 
    /* Encoders directly attached to ESP32 board */
-  //  #define ESP32_ENC_COUNTER
+   #define ESP32_ENC_COUNTER
 
-   
+   /* Cytron MDD3A Motor driver*/
+   #define CYTRON_MDD3A
    
 #endif
 
