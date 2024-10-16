@@ -108,7 +108,7 @@
   }
 
   long readEncoder(int i) {
-    if (i == LEFT) return leftEncoder.getCount();
+    if (i == LEFT) return -(leftEncoder.getCount());
     else return rightEncoder.getCount();
   }
 

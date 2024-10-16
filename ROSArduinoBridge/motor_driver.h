@@ -16,13 +16,13 @@
   /* Include the Pololu library */
   #include "CytronMotorDriver.h"
   
-  #define M1A 32
-  #define M1B 33
-  #define M2A 18
-  #define M2B 19
+  #define M1A 18
+  #define M1B 19
+  #define M2A 32
+  #define M2B 33
 
-  extern CytronMD motor1;
-  extern CytronMD motor2;
+  extern CytronMD motor_left;
+  extern CytronMD motor_right;
 #endif
 
 void initMotorController();

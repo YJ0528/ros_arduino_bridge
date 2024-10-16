@@ -92,16 +92,16 @@
   #include "CytronMotorDriver.h"
 
   /* Configure the motor driver. */
-  CytronMD motor1(PWM_PWM, M1A, M1B);
-  CytronMD motor2(PWM_PWM, M2A, M2B);
+  CytronMD motor_left(PWM_PWM, M1A, M1B);
+  CytronMD motor_right(PWM_PWM, M2A, M2B);
   
   void initMotorController() {
   }
   
   /* Wrap the drive motor set speed function */
   void setMotorSpeed(int i, int spd) {
-    if (i == LEFT) motor1.setSpeed(spd);
-    else motor2.setSpeed(spd);
+    if (i == LEFT) motor_left.setSpeed(spd);
+    else motor_right.setSpeed(spd);
   }
 
   /* A convenience function for setting both motor speeds */

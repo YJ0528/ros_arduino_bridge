@@ -17,10 +17,10 @@
 #ifdef ESP32_ENC_COUNTER
     
   // ESP32 GPIO pins for encoders
-  #define LEFT_ENC_A 26
-  #define LEFT_ENC_B 27
-  #define RIGHT_ENC_A 16
-  #define RIGHT_ENC_B 17
+  #define LEFT_ENC_A 16
+  #define LEFT_ENC_B 17
+  #define RIGHT_ENC_A 26
+  #define RIGHT_ENC_B 27
 #endif
 
 #ifdef ESP32_ENC_COUNTER
@@ -30,4 +30,3 @@
 long readEncoder(int i);
 void resetEncoder(int i);
 void resetEncoders();
-
